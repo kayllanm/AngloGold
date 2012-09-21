@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Insert title here</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1"> 
+	<link rel="stylesheet" href="jquery.mobile-1.1.1.css" />
+
+</head>
+<body onload="onLoad()">
+<div data-role="page">
+
+	<div data-role="header" data-theme="e">
+		<h1>AngloGold</h1>
+	</div><!-- /header -->
+
+
+	<div data-role="content">
+	<form id="formAtt" action="javascript:validate();">
+	<div data-role="collapsible" data-mini="true" data-theme="e" data-content-theme="d" >
+		<h3><label id="th1"></label></h3>
+		<table>
+			<tr>
+				<td>
+		<label id="lb1"></label>
+				</td>
+				<td>
+				<fieldset data-role="controlgroup" data-mini="true">
+		<input type='radio' name='rad' id="grp1yes" value="yes"/><label for="grp1yes">Yes</label>  
+		<input type='radio' name='rad' id="grp1no" value="no" /><label for="grp1no">No</label>
+				</fieldset>
+				</td>
+			</tr>
+		</table>
+	</div>	
+	<br />
+	<div id="ItemGroup2" data-role="collapsible" data-mini="true" data-theme="e" data-content-theme="d" >
+		<h3><label id="th2"></label></h3>
+		<table>
+		<tr>
+			<td>
+				<label id="lb2"></label>
+			</td>
+			<td>	
+				<select data-inline="true" data-mini="true" id="dropdown">
+					<option>Select Item</option>
+				</select>
+			</td>
+		</tr>
+		</table>
+	</div>
+	<br />
+	<div id="style2" data-role="collapsible" data-mini="true" data-theme="e" data-content-theme="d" >
+		<h3><label id="th3"></label></h3>
+		<table>
+			<tr>
+				<td>
+				<label id="lb3"></label>
+				</td>
+				<td>
+				<fieldset data-role="controlgroup" data-mini="true">
+				<input type='radio' id="yes"  name='hide' value='rbtnRadioYes'  onclick="rbtn_validation()"/><label for="yes">Yes</label>
+				<input type='radio' id="no" name='hide' value='rbtnRadioNo' onclick="rbtn_validation()"/><label for="no">No</label>
+				</fieldset>
+				</td>
+			</tr>
+		</table>
+	</div>	
+	<br />
+	<input type='submit' name='submit' value='Submit' data-inline="true" data-mini="true" />
+	</form>
+	</div><!-- /content -->
+	
+	</div><!-- /page -->
+<script type="text/javascript" charset="utf-8" src="jquery.js"></script>
+<script type="text/javascript" charset="utf-8" src="jquery.mobile-1.1.1.js"></script>
+<script type="text/javascript" charset="utf-8" src="cordova-2.0.0.js"></script>
+<script type="text/javascript" charset="utf-8" src="validate.js"></script>
+<script type="text/javascript">
+function onLoad() {        
+	document.addEventListener("deviceready", onDeviceReady, false);   
+	return false;
+}    
+// PhoneGap is loaded and it is now safe to make calls PhoneGap methods    
+//    
+
+    // Cordova is ready
+    //
+function onDeviceReady() {
+        window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, gotFS, fail); 
+        return false;
+    }
+
+    function gotFS(fileSystem) {
+        fileSystem.root.getFile("AgaUpload/ST_Mobile_Device_-_Stoping_Capture_Form.xml", null, gotFileEntry, fail);
+        fileSystem.root.getDirectory("AgaHistory", {create: true, exclusive: false}, onGetDirectorySuccess, onGetDirectoryFail);
+        return false;
+    }
+    
+    function onGetDirectorySuccess(dir) { 
+        console.log("Created dir "+dir.name); 
+        return false;
+    } 
+
+  	function onGetDirectoryFail(error) { 
+       console.log("Error creating directory "+error.code); 
+       return false;
+  	} 
+
+
+    function gotFileEntry(fileEntry) {
+        fileEntry.file(gotFile, fail);
+        return false;
+    }
+
+    function gotFile(file){
+        readAsText(file);
+        return false;
+    }
+
+    function readAsText(file) {
+        var reader = new FileReader();
+        reader.onloadend = function(evt) {
+        	var xml = evt.target.result;
+        	xmlParser(xml);
+        };
+        reader.readAsText(file);
+        return false;
+    }
+ 
+    function xmlParser(xml){
+    	    xmlDoc = $.parseXML( xml ),    
+    	    $xml = $( xmlDoc ),      	    
+    	    $cjs = $xml.find("CustomJavascript");
+    	    $("#style2").css("background-color", "silver");
+    	    
+    	    $title = $xml.find( "ChecklistGroupName");
+    	    /* append th elements */
+    	    	$( "#th1" ).html( $title.eq(0).text());
+    	    	$( "#th2" ).html( $title.eq(1).text());
+    	    	$( "#th3" ).html( $title.eq(2).text());
+    	    
+    	    $item = $xml.find("ChecklistItemName");
+    	    /* append label tags */
+    	    	$("#lb1").html($item.eq(0).text());
+    	    	$("#lb2").html($item.eq(1).text());
+    	    	$("#lb3").html($item.eq(2).text());
+    	    
+    	    $cvString = $xml.find("cvString").each(function() {
+    	    	var i = $xml.find("cvString").index(this);
+    	    	if(i < 10) {
+    	    		$("#dropdown").append("<option>" + $(this).text() + "</option>");
+    	        }
+    	    });
+    }
+     
+    
+    function fail(evt) {
+        console.log(evt.target.error.code);
+        return false;
+    }
+    
+    function rbtn_validation(){		
+    	var itemGrp2 = $("#ItemGroup2");
+    	if(document.getElementById("yes").checked) { 
+    		if(confirm("Are you sure you want to hide Group 2?")) { 
+    			itemGrp2.hide("slow"); 
+    			} 
+    	} else {
+    			if(confirm("Are you sure you want to show Group 2?")) { 
+    				itemGrp2.show("slow"); 
+    			}
+    	}
+    	return false;
+    }
+    
+    
+</script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+<resources>
+
+    <string name="app_name">AngloGold</string>
+    <string name="menu_settings">Settings</string>
+    <string name="title_activity_main">AngloGold</string>
+    <string name="desc">Main</string>
+    <string name="welcome">Welcome!</string>
+
+</resources>
